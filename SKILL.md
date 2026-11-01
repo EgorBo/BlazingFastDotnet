@@ -179,7 +179,7 @@ DOTNET_JitDisasmOnlyOptimized=1    # show only Tier-1/FullOpts code
 - For BenchmarkDotNet methodology, see the [dotnet/runtime microbenchmark skill](https://github.com/dotnet/runtime/blob/main/.github/skills/microbenchmark/SKILL.md).
 - `AggressiveOptimization` is usually a deoptimization.
 - Overusing `AggressiveInlining` may hurt performance (e.g. by exhausting the inliner's time budget or increasing the number of tracked local variables).
-- Keep small hot methods small: move the rare path (grow/resize, slow fallback) into a separate `[MethodImpl(MethodImplOptions.NoInlining)]` method, as `List<T>.Add` does with `AddWithResize`, so it is not inlined into the hot caller.
+- Moving rarely taken paths (grow/resize, slow fallback) into a separate method marked with  `[MethodImpl(MethodImplOptions.NoInlining)]` may improve performance (as `List<T>.Add` does with `AddWithResize`), but it may also hinder escape analysis.
 - Don't put too much data into TLS (Thread-Local Storage) - excessive use can lead to increased memory usage and cache pressure, reducing overall performance (there can be a lot of threads, each with its own copy).
 - Consider `CollectionsMarshal.AsSpan(list)` for `List<T>` (there is no `List<T>.AsSpan()`), or `.AsSpan()` on collections that support it, to avoid unnecessary overhead from bound and covariance checks, and to enable span-based algorithms directly on the collection's underlying memory. Don't add or remove list items while the span is in use.
 
